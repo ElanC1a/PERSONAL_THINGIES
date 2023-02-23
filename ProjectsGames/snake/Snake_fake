@@ -1,0 +1,145 @@
+from ctypes import windll
+from tkinter import font
+from tkinter.font import BOLD
+from turtle import up, update
+import pygame
+from pygame import mixer
+from os import path
+import time
+import random
+
+pygame.init()
+
+WIDTH=1920
+HEIGHT=1080
+screen=pygame.display.set_mode((WIDTH,HEIGHT))
+pygame.display.set_caption("Jörmungandr")
+
+def end_game(message, color):
+    end_message=font_style.render(message, True, color)
+    screen.blit(end_message,[(WIDTH/2)-800, HEIGHT/2])  #first Width, then Height
+font_style=pygame.font.SysFont("Arial", 50, BOLD)
+
+def growth(snake_body):
+    for i in snake_body: #i - index of each element
+        pygame.draw.rect(screen,black,(i[0],i[1], 30,30))
+score_font=pygame.font.SysFont("Arial", 40, BOLD)
+
+def points(score):
+    point_message=score_font.render("Your score: %s" %score, True, black)
+    screen.blit(point_message,[0,0])
+
+def game():
+    control=True
+    end=False
+    x_cordinate=WIDTH/2  #initial placement
+    y_cordinate=HEIGHT/2
+
+    x=0
+    y=0
+
+    apple_image=pygame.image.load(path.join(image,"joshuaapple.png")).convert()
+    apple=pygame.transform.scale(apple_image,(30, 30))
+
+    food_x=round(random.randrange(0,(WIDTH-30)/30)*30)
+    food_y=round(random.randrange(0,(HEIGHT-30)/30)*30)
+    apple_real=apple.get_rect(x=food_x, y=food_y)
+
+    snake_body=[]
+    snake_length=1
+
+    while control:                          #движок
+        while end==True:
+            end_game("YOU'VE LOST!!!, press R to replay the game or E to exit", red)
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type==pygame.KEYDOWN:
+                    if event.key==pygame.K_r:
+                        game()      
+                    elif event.key==pygame.K_e:
+                        end=False
+                        control=False
+        for event in pygame.event.get():            #movement
+            if event.type==pygame.QUIT:
+                control=False
+            if event.type==pygame.KEYDOWN:
+                if event.key==pygame.K_LEFT:
+                    x=-30 
+                    y=0
+                elif event.key==pygame.K_RIGHT:
+                    x=30
+                    y=0
+                elif event.key==pygame.K_DOWN:
+                    x=0
+                    y=30
+                elif event.key==pygame.K_UP:
+                    x=0
+                    y=-30
+        x_cordinate+=x
+        y_cordinate+=y 
+        if x_cordinate>=WIDTH or x_cordinate<0 or y_cordinate>=HEIGHT or y_cordinate<0:     #losing parameters
+            end=True
+            time.sleep(2)
+
+        screen.blit(bg,bg_real) #screen.fill(light_blue)   #screen.blit(bg,bg_real) yusif
+
+        #pygame.draw.rect(screen,black,(x_cordinate, y_cordinate, 30,30))
+        snake_head_cordinate=[]
+        snake_head_cordinate.append(x_cordinate)
+        snake_head_cordinate.append(y_cordinate)
+        snake_body.append(snake_head_cordinate)
+
+        if len(snake_body)>snake_length:
+            del snake_body[0]      #del - delete
+            points(snake_length-1)
+            growth(snake_body)
+        if food_x==x_cordinate and food_y==y_cordinate:
+            food_x=round(random.randrange(0,(WIDTH-30)/30)*30)
+            food_y=round(random.randrange(0,(HEIGHT-30)/30)*30)
+            apple_real=apple.get_rect(x=food_x, y=food_y)
+            snake_length+=1
+        pygame.draw.rect(screen,red,(food_x, food_y, 30, 30))
+        screen.blit(apple,apple_real)
+
+        for i in snake_body[:-1]:
+            if i==snake_head_cordinate:
+                end=True
+        
+        pygame.display.update()
+        pygame.display.flip()
+        clock.tick(snake_speed)
+
+    pygame.quit()
+    quit()
+
+image=path.join(path.dirname(__file__))
+bg=pygame.image.load(path.join(image,"yusif.png")).convert()
+bg=pygame.transform.scale(bg,(WIDTH,HEIGHT))
+bg_real=bg.get_rect()   #получаем данные
+
+
+audio=path.join(path.dirname(__file__))
+
+#song="C:\\Program Files\\Python310\\1 Python programmes\\ProjectsGames\\snake\\kirbytheme.mp3"  #added
+
+pygame.mixer.music.load(path.join(audio,"daniil.mp3"))
+
+mixer.init()
+
+#mixer.music.load(song) #added
+
+pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.3)
+
+#bg
+light_blue=(153,204,255)
+light_purple=(178,102,255)
+turquoise=(100,192,192)
+black=(192, 192, 192)
+ugly=(74, 65, 42)
+red=(255,0,0)
+
+snake_speed=10
+clock=pygame.time.Clock()
+
+game()

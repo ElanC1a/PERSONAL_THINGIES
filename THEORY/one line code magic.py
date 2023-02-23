@@ -1,0 +1,1 @@
+for number in range( *(lambda x: (x, x + 3))( int(input()) ) ): print(number)
