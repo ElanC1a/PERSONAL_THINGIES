@@ -13,7 +13,7 @@ monster_damage=[10, 20, 15, 12]
 monster=[]
 
 
-bot=telebot.TeleBot("Put your token in here")
+bot=telebot.TeleBot("Put your token in here") #5564429631:AAGrDfkh51VO43t62pLMFUtOjnsGU3E96uI
 @bot.message_handler(commands=["help"])
 def help(message):
     bot.send_message(message.chat.id, "This is a function menu \n These functions can be used: /start")
